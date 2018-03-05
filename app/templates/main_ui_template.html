@@ -1,0 +1,146 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <link rel="Bookmark" href="/favicon.ico">
+    <link rel="Shortcut Icon" href="/favicon.ico"/>
+    <!--[if lt IE 9]>
+    <!--<script type="text/javascript" src="http://lib.h-ui.net/html5.js"></script>-->
+    <!--<script type="text/javascript" src="http://lib.h-ui.net/respond.min.js"></script>-->
+    <!--<![endif]&ndash;&gt;-->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='css/dashboard.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/H-ui.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/H-ui.admin.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="http://static.h-ui.net/www/css/H-ui.doc.css"/>
+    <link rel="stylesheet" href="http://lib.h-ui.net/Hui-iconfont/1.0.8/iconfont.min.css"/>
+
+    <!--[if lt IE 9]>
+    <!--<link href="http://static.h-ui.net/h-ui/css/H-ui.ie.css" rel="stylesheet" type="text/css" />-->
+    <!--<![endif]&ndash;&gt;-->
+    <script type="text/javascript" src="http://lib.h-ui.net/jquery/1.9.1/jquery.min.js"></script>
+    <!--[if IE 6]>
+    <!--<script type="text/javascript" src="http://lib.h-ui.net/DD_belatedPNG_0.0.8a-min.js" ></script>-->
+    <!--<script>DD_belatedPNG.fix('.pngfix,.iconpic,.list-icon');</script>-->
+    <!--[endif]-->
+    <!-- 反运营商劫持 S -->
+    <!--<style type="text/css">-->
+    <!--html {-->
+    <!--display:none;-->
+    <!--}-->
+    <!--</style>-->
+    <script>
+if( self == top ) {
+	document.documentElement.style.display = 'block' ;
+} else {
+	top.location = self.location ;
+}
+
+    </script>
+
+    <title>测试信息平台</title>
+    <meta name="keywords" content="信息平台hera">
+    <meta name="description" content="测试信息平台hera">
+    <!--<style type="text/css">-->
+    <!--#Hui-nav li#Huinav_2 a, #Hui-nav li#Huinav_2 a:hover-->
+    <!--{-->
+    <!--color: #fff;-->
+    <!--background-color: #111-->
+    <!--}-->
+    <!--</style>-->
+</head>
+<body onLoad="prettyPrint()">
+<header class="navbar-wrapper">
+    <div class="navbar navbar-black">
+        <div class="container-fluid cl">
+            <a class="logo navbar-logo hidden-xs" href="#">测试信息平台</a>
+            <a class="logo navbar-logo-m visible-xs" href="#">mytest</a>
+            <!--<span class="logo navbar-slogan hidden-xs">高效 &middot; 合作 &middot; </span>-->
+            <a aria-hidden="false" class="nav-toggle Hui-iconfont visible-xs" href="javascript:;">&#xe667;</a>
+            <nav id="Hui-nav" class="nav navbar-nav">
+                <ul class="cl">
+                    <li id="hera_1"><a href="/">首页</a></li>
+                </ul>
+            </nav>
+            <nav class="navbar-userbar f-r hidden-xs hidden-sm">
+                <!--<a href="javascript:void(0);" onclick="setup();return !1;" class="btn btn-primary radius" title="设置">设置</a>-->
+                <!--<a class="btn btn-secondary radius" target="_blank" href="/auth/logout">退出</a>-->
+                <a class="btn btn-success radius" target="_blank" href="/help">帮助</a>
+            </nav>
+        </div>
+    </div>
+</header>
+<aside class="Hui-aside">
+    <input runat="server" id="divScrollValue" type="hidden" value=""/>
+    <div class="menu_dropdown bk_2">
+        <dl id="menu_1">
+            <dt>统计数据<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    <li><a href="/feature_test_progress">测试任务进度</a></li>
+                    <li><a href="/regression_progress">回归测试进度</a></li>
+                    <li><a href="/bug_info">新增缺陷趋势</a></li>
+                    <li><a href="/bug_status">缺陷状态展示</a></li>
+                    <li><a href="/unit_test">单元测试分布</a></li>
+                    <li><a href="/auto_test">自动用例分布</a></li>
+                    <li><a href="/manual_test">手工用例分布</a></li>
+                    <li><a href="/auto_rate">测试自动化率</a></li>
+                    <li><a href="/jenkins_builds">失败的DailyTest</a></li>
+
+                </ul>
+            </dd>
+        </dl>
+        <!--<dl id="menu_2">-->
+        <!--<dt>测试资源<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>-->
+        <!--<dd>-->
+        <!--<ul>-->
+        <!--<li><a href="/pc_info">测试机器</a></li>-->
+        <!--<li><a href="/device_info">测试设备</a></li>-->
+        <!--<li><a href="/channel_info">测试频道</a></li>-->
+        <!--<li><a href="/people_info">测试人员</a></li>-->
+        <!--</ul>-->
+        <!--</dd>-->
+        <!--</dl>-->
+        <dl id="menu_3">
+            <dt>常用链接<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    <li><a href="http://10.3.0.10/root/doc/wikis/home">Wiki</a></li>
+                    <li><a href="http://10.3.0.12:8080/zentao">Zentao</a></li>
+                    <li><a href="http://10.4.0.1:8080/">Jenkins</a></li>
+                    <li><a href="http://testlink.crazycdn.cn/login.php">TestLink</a></li>
+                    <li><a href="http://redmine.cloutropy.com/">Redmine</a></li>
+                    <li><a href="http://monitor.cloutropy.com/">Monitor</a></li>
+                    <li><a href="http://oops.cloutropy.com/">OOPS</a></li>
+                    <li><a href="https://worktile.com/project/600a540dbbd74776a4fd10ab384fbf9c/task">Worktile</a></li>
+                </ul>
+            </dd>
+        </dl>
+    </div>
+</aside>
+
+<div class="dislpayArrow hidden-xs">
+    <a class="pngfix" href="javascript:void(0);" onClick="displaynavbar(this)"></a>
+</div>
+<section class="Hui-article-box">
+    <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i></nav>
+    <div class="Hui-article" id="main_template">
+        <script type="text/javascript" src="http://lib.h-ui.net/prettify.js"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/H-ui.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/H-ui.admin.js') }}"></script>
+        <!--<script type="text/javascript" src="http://static.h-ui.net/www/js/common.js"></script>-->
+        {% block body %} {% endblock %}
+    </div>
+</section>
+
+
+</body>
+</html>

@@ -1,0 +1,92 @@
+{% extends "main_ui_template.html" %}
+
+
+{% block title %}
+    测试信息平台
+{% endblock %}
+
+
+{% block body %}
+    <div class="page-header" align="center" >
+        <h2>Hera平台使用帮助</h2>
+    </div>
+<div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+
+                <table class="table table-bordered table-striped" >
+                  <thead>
+                    <tr>
+                      <th>功能</th>
+                      <th>解释</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>回归执行进度</td>
+                      <td>展示TestLink里测试计划的执行情况</td>
+                    </tr>
+                    <tr>
+                      <td>缺陷统计展示</td>
+                      <td>最近一段时间每天提交的缺陷数，数据来自zentao系统</td>
+                    </tr>
+                    <tr>
+                      <td>失败的DailyTest</td>
+                      <td>展示jenkins里失败build的最新build记录</td>
+                    </tr>
+                    <tr>
+                      <td>自动用例分布</td>
+                      <td>自动化测试用例测试点及其数目，数据来自zeus系统</td>
+                    </tr>
+                    <tr>
+                      <td>手工用例分布</td>
+                      <td>手工测试用例的分布，数据来自TestLink</td>
+                    </tr>
+                    <tr>
+                      <td>测试自动化率</td>
+                      <td>自动化测试用例占总用例数的百分比</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+
+
+
+<!--<table class="table table-hover">-->
+    <!--<thead>-->
+    <!--<tr>-->
+      <!--<th>ID</th>-->
+      <!--<th>Name</th>-->
+        <!--<th>Operation</th>-->
+    <!--</tr>-->
+    <!--</thead>-->
+    <!--<tbody>-->
+    <!--{% for data in datas %}-->
+
+
+    <!--<tr>-->
+      <!--<td>{{data["id"]}}</td>-->
+      <!--<td>{{data["name"]}}</td>-->
+        <!--<td>-->
+            <!--<button class="btn btn-small btn-primary" type="button" onclick = "delete_data({{data['id']}});">Delete</button>-->
+        <!--</td>-->
+    <!--</tr>-->
+
+    <!--{% endfor %}-->
+    <!--</tbody>-->
+
+<!--</table>-->
+
+<!--<script>-->
+        <!--function delete_data(id){-->
+            <!--alert("Start to update db!" + id );-->
+            <!--self.location = "/help/delete/"+id;-->
+        <!--}-->
+
+    <!--</script>-->
+
+{% endblock %}
+

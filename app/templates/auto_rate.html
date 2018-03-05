@@ -1,0 +1,136 @@
+{% extends "main_ui_template.html" %}
+
+
+{% block title %}
+    测试信息平台
+{% endblock %}
+
+{% block body %}
+    <h2 style="text-align: center">测试用例自动化率</h2>
+
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="height:540px"></div>
+    <!-- ECharts单文件引入 -->
+    <script src="{{ url_for('static', filename='js/echarts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/macarons.js') }}"></script>
+    <script type="text/javascript">
+        var case_distribution = {{ case_distribution|tojson }};
+        var auto_case_num = case_distribution['auto_case_num']
+        var manual_case_num = case_distribution['manual_case_num']
+        var rate_value = 0
+        if (auto_case_num != 0)
+        {
+            rate_value = (auto_case_num / (auto_case_num + manual_case_num) * 100).toFixed(2);
+        }
+        // 路径配置
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/gauge'
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+                var gaugeChart = ec.init(document.getElementById('main'), e_macarons);
+
+                var option = {
+                    tooltip : {
+                        formatter: "{a} <br/>{b} : {c}%"
+                    },
+                    title : {
+                        text: '',
+                        subtext: '  自动用例总数: ' + auto_case_num + '\n'  +
+                                 '  手动用例总数: ' + manual_case_num + '\n'  +
+                                 '  测试用例总数: ' + (auto_case_num + manual_case_num),
+                        textStyle: {
+                            fontSize: 30,
+                            fontFamily: 'Arial',
+                            fontWeight: 'bolder',
+                            color: 'black'
+                        },
+                        subtextStyle: {
+                            fontSize: 20,
+                            fontFamily: 'sans-serif',
+                            //fontWeight: 'bolder',
+                            color: '#B22222'
+                        },
+                    },
+                    series : [
+                        {
+                            name:'测试自动化率',
+                            type:'gauge',
+                            startAngle: 180,
+                            endAngle: 0,
+                            center : ['50%', '70%'],    // 默认全局居中
+                            radius : 320,
+                            axisLine: {            // 坐标轴线
+                                lineStyle: {
+                                    color: [
+                                        [0.3, '#ff4500'],
+                                        [0.7, '#48b'],
+                                        [1, '#228b22']
+                                    ],
+                                    width: 180
+                                }
+                            },
+                            axisLabel: {           // 坐标轴文本标签，详见axis.axisLabel
+                                formatter: function(v){
+                                    switch (v+''){
+                                        case '10': return '';
+                                        case '50': return '';
+                                        case '90': return '';
+                                        default: return '';
+                                    }
+                                },
+                                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                                    color: '#fff',
+                                    fontSize: 15,
+                                    fontWeight: 'bolder'
+                                }
+                            },
+                            pointer: {
+                                width:50,
+                                length: '90%',
+                                color: 'rgba(255, 255, 255, 0.8)'
+                            },
+                            title : {
+                                show : true,
+                                offsetCenter: [0, '-60%'],       // x, y，单位px
+                                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                                    color: '#fff',
+                                    fontSize: 30
+                                }
+                            },
+                            detail : {
+                                show : true,
+                                backgroundColor: 'rgba(0,0,0,0)',
+                                borderWidth: 0,
+                                borderColor: '#ccc',
+                                width: 100,
+                                height: 40,
+                                offsetCenter: [0, -40],       // x, y，单位px
+                                formatter:'{value}%',
+                                textStyle: {       // 其余属性默认使用全局文本样式，详见TEXTSTYLE
+                                    fontSize : 50
+                                }
+                            },
+                            data:[{value: rate_value, name: '测试自动化率'}]
+                        }
+                    ]
+                };
+                // 为echarts对象加载数据
+                gaugeChart.setOption(option);
+            }
+        );
+    </script>
+    <script type="text/javascript">
+      $("#menu_1 dt").addClass("selected");$("#menu_1 dd").show();;
+    </script>
+
+{% endblock %}
+

@@ -1,0 +1,126 @@
+{% extends "main_ui_template.html" %}
+
+
+{% block title %}
+    测试信息平台
+{% endblock %}
+
+{% block body %}
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <!--<div id="piemain" style="height:400px"></div>-->
+    <h2 style="text-align: center">每天新增bug数一览</h2>
+    <div id="barmain" style="height:540px"></div>
+    <!-- ECharts单文件引入 -->
+    <script src="{{ url_for('static', filename='js/echarts.js') }}"></script>
+    <script type="text/javascript">
+        var data = {{ bug_info|tojson }};
+        var date_array = new Array();
+        var date_number_array = new Array();
+        var j = 0;
+        var max_number = 0;
+        var count_case_number = 0;
+        for (var i in data) {
+            if (j % 2 != 0){
+                date_array[j] = '\n' + data[i][0];
+            }
+            else{
+                date_array[j] = data[i][0];
+            }
+            date_number_array[j] = Number(data[i][1]);
+            count_case_number += Number(data[i][1]);
+            if (max_number < Number(data[i][1])){
+                max_number = Number(data[i][1]);
+            }
+            j++;
+        }
+        while (max_number % 10 != 0)
+        {
+            max_number++;
+        }
+        // 路径配置
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/bar',
+                'echarts/chart/gauge'
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+
+                 // -----barChart start-----
+                var barChart = ec.init(document.getElementById("barmain"));
+                var option={
+                    title : {
+                        <!--'text':'总数：' + count_case_number,-->
+                        //'subtext':'数据来自Zeus-robot',
+                        'textStyle': {
+                            fontSize: 22,
+                            fontWeight: 'bolder',
+                            color: '#483d8b'
+                        }
+                    },
+                    xAxis :{
+                        type : 'category',
+                        position: 'bottom',
+                        boundaryGap: true,
+                        axisLabel : {
+
+                            interval: 0,    // {number}
+                        },
+                        data : date_array
+                    },
+                    yAxis :
+                        {
+                            type : 'value',
+                            position: 'left',
+                            min: 0,
+                            max: max_number,
+                            //splitNumber: 10,
+                            boundaryGap: [0,0.1],
+                    },
+                    series : [
+                        {
+                        name:'DailyTest信息',
+                        type:'bar',
+                        itemStyle: {
+                            normal: {
+                                color: function(params) {
+                                    // build a color map as your need.
+                                    var colorList = [
+                                        '#ff7f50', '#87cefa', '#da70d6', '#32cd32', '#6495ed',
+                                        '#ff69b4', '#ba55d3', '#cd5c5c', '#ffa500', '#40e0d0',
+                                        '#1e90ff', '#ff6347', '#7b68ee', '#00fa9a', '#ffd700',
+                                        '#6b8e23', '#ff00ff', '#3cb371', '#b8860b', '#30e0e0'
+                                    ];
+                                    return colorList[params.dataIndex]
+                                },
+                                label: {
+                                    show: true,
+                                    position: 'top',
+                                    formatter: '{c}',
+                                    textStyle: {
+                                        fontSize: 20
+                                    }
+                                }
+                            }
+                        },
+                        data: date_number_array
+                        }
+                    ]
+                };
+                barChart.setOption(option);
+            }
+        );
+    </script>
+    <script type="text/javascript">
+      $("#menu_1 dt").addClass("selected");$("#menu_1 dd").show();;
+    </script>
+
+{% endblock %}
+

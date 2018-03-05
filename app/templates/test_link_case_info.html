@@ -1,0 +1,243 @@
+{% extends "main_ui_template.html" %}
+
+
+{% block title %}
+    测试信息平台
+{% endblock %}
+
+{% block body %}
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <!--<div id="piemain" style="height:400px"></div>-->
+    <h2 style="text-align: center">手动用例分布一览</h2>
+    <div id="barmain" style="height:540px"></div>
+    <!-- ECharts单文件引入 -->
+    <script src="{{ url_for('static', filename='js/echarts.js') }}"></script>
+    <script type="text/javascript">
+        var data = {{ test_case|tojson }};
+        var name_array = new Array();
+        var number_array = new Array();
+        var j = 0;
+        var max_number = 0;
+        var total_case = 0;
+        for (var i in data) {
+            if (data[i].number != 0)
+            {
+                name_array[j] = data[i].name;
+                number_array[j] = data[i].number;
+                total_case += data[i].number;
+                max_number = max_number < data[i].number ? data[i].number : max_number;
+                j++;
+            }
+        }
+        while (max_number % 50 != 0)
+        {
+            max_number++;
+        }
+        <!--alert(name_array);-->
+        <!--alert(number_array);-->
+        // 路径配置
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/pie',
+                'echarts/chart/bar'
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+                <!--var pieChart = ec.init(document.getElementById('piemain'));-->
+
+                <!--var option = {-->
+                    <!--tooltip : {-->
+                    <!--//鼠标悬停时的交互-->
+                                <!--trigger: 'item',-->
+                                <!--formatter: "{a} <br/>{b} : {c} ({d}%)"-->
+                              <!--},-->
+                    <!--legend: {-->
+                                <!--//图例 最多仅有一个-->
+                                <!--orient : 'vertical',-->
+                                <!--x : 'left',-->
+                                <!--textStyle : {color: '#333', padding: '10', fontSize: 20, fontFamily: 'Verdana'},-->
+                                <!--data:['功能测试','性能测试','稳定性测试','可用性测试','维护测试','安全性测试','特征测试']-->
+                            <!--},-->
+                    <!--toolbox: {-->
+                        <!--// 右上角的工具箱-->
+                        <!--show : true,-->
+                        <!--feature : {-->
+                            <!--mark : {show: true},-->
+                            <!--dataView : {show: true, readOnly: false},-->
+                            <!--magicType : {-->
+                                <!--show: true,-->
+                                <!--type: ['pie', 'funnel'],-->
+                                <!--option: {-->
+                                    <!--funnel: {-->
+                                        <!--x: '25%',-->
+                                        <!--width: '50%',-->
+                                        <!--funnelAlign: 'center',-->
+                                        <!--max: 1548-->
+                                    <!--}-->
+                                <!--}-->
+                            <!--},-->
+                            <!--restore : {show: true},-->
+                            <!--saveAsImage : {show: true}-->
+                        <!--}-->
+                    <!--},-->
+                    <!--calculable : false,-->
+                    <!--series : [-->
+                       <!--{-->
+                            <!--name:'TestLink库',-->
+                            <!--type:'pie',-->
+                            <!--radius : '60%',-->
+                            <!--center: ['50%', '50%'],-->
+                            <!--data:[-->
+                                <!--{value:336, name:'功能测试'},-->
+                                <!--{value:25, name:'性能测试'},-->
+                                <!--{value:2, name:'稳定性测试'},-->
+                                <!--{value:1, name:'可用性测试'},-->
+                                <!--{value:0, name:'维护测试'},-->
+                                <!--{value:0, name:'安全性测试'},-->
+                                <!--{value:0, name:'特征测试'}-->
+                            <!--]-->
+                        <!--}-->
+                    <!--]-->
+                    <!--};-->
+
+                <!--// 为echarts对象加载数据 -->
+                <!--pieChart.setOption(option);-->
+
+                 // -----barChart start-----
+                var barChart = ec.init(document.getElementById("barmain"));
+                <!--window.onresize = barChart.resize;-->
+                <!--barChart.showLoading();-->
+                option={
+                    title : {
+                        'text':'总数：' + total_case ,
+                        'textStyle': {
+                            fontSize: 22,
+                            fontWeight: 'bolder',
+                            color: '#F0805A'
+                        }
+                    },
+                    color :['#ff7f50', '#87cefa', '#da70d6', '#32cd32', '#6495ed'],
+                    xAxis :{
+                        type : 'category',
+                        position: 'bottom',
+                        boundaryGap: true,
+                        data : []
+                    },
+                    yAxis :
+                        {
+                            type : 'value',
+                            position: 'left',
+                            min: 0,
+                            max: max_number,
+                            //splitNumber: 10,
+                            boundaryGap: [0,0.1],
+                            <!--axisLine : {    // 轴线-->
+                                <!--show: true,-->
+                                <!--lineStyle: {-->
+                                    <!--color: 'red',-->
+                                    <!--type: 'dashed',-->
+                                    <!--width: 2-->
+                                <!--}-->
+                            <!--},-->
+                            <!--axisTick : {    // 轴标记-->
+                                <!--show:true,-->
+                                <!--length: 10,-->
+                                <!--lineStyle: {-->
+                                    <!--color: 'green',-->
+                                    <!--type: 'solid',-->
+                                    <!--width: 2-->
+                                <!--}-->
+                            <!--},-->
+                            <!--axisLabel : {-->
+                                <!--show:true,-->
+                                <!--interval: 'auto',    // {number}-->
+                                <!--rotate: -45,-->
+                                <!--margin: 18,-->
+                                <!--formatter: '{value} ',    // Template formatter!-->
+                                <!--textStyle: {-->
+                                    <!--color: '#1e90ff',-->
+                                    <!--fontFamily: 'verdana',-->
+                                    <!--fontSize: 10,-->
+                                    <!--fontStyle: 'normal',-->
+                                    <!--fontWeight: 'bold'-->
+                                <!--}-->
+                            <!--},-->
+                            <!--splitLine : {-->
+                                <!--show:true,-->
+                                <!--lineStyle: {-->
+                                    <!--color: '#483d8b',-->
+                                    <!--type: 'dotted',-->
+                                    <!--width: 2-->
+                                <!--}-->
+                            <!--},-->
+                            <!--splitArea : {-->
+                                <!--show: true,-->
+                                <!--areaStyle:{-->
+                                    <!--color:['rgba(205,92,92,0.3)','rgba(255,215,0,0.3)']-->
+                                <!--}-->
+                            <!--}-->
+                    },
+                    series : [
+                        {
+                        name:'TestLink库',
+                        type:'bar',
+                        itemStyle: {
+                            normal: {
+                                color: function(params) {
+                                    // build a color map as your need.
+                                    var colorList = [
+                                        '#D7504B','#60C0DD','#FAD860','#F3A43B',
+                                        '#27727B','#FE8463','#9BCA63','#E87C25',
+                                        '#C6E579','#F4E001','#F0805A','#26C0C0',
+                                        '#C1232B','#B5C334','#FCCE10',
+                                    ];
+                                    return colorList[params.dataIndex]
+                                },
+                                label: {
+                                    show: true,
+                                    position: 'top',
+                                    formatter: '{c}',
+                                    textStyle: {
+                                        fontSize: 20
+                                    }
+                                }
+                            }
+                        },
+                        data: number_array
+                        }
+                    ]
+                };
+                for (i = 0; i < name_array.length; i++) {
+                var item = {
+                    value : name_array[i],
+                    textStyle:{
+                        color: 'black',
+                        fontSize: 21
+                    }
+                };
+                option.xAxis.data.push(item);
+                };
+                clearTimeout(loadingTicket);
+                var loadingTicket = setTimeout(function() {
+                    barChart.hideLoading();
+                    barChart.setOption(option);
+                }, 50);
+
+            }
+
+        );
+    </script>
+
+    <script type="text/javascript">
+      $("#menu_1 dt").addClass("selected");$("#menu_1 dd").show();;
+    </script>
+
+{% endblock %}
+

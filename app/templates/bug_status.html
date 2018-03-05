@@ -1,0 +1,113 @@
+{% extends "main_ui_template.html" %}
+
+
+{% block title %}
+    测试信息平台
+{% endblock %}
+
+{% block body %}
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <!--<div id="piemain" style="height:400px"></div>-->
+    <h2 style="text-align: center">bug状态一览</h2>
+    <div id="piemain" style="height:540px"></div>
+    <!-- ECharts单文件引入 -->
+    <script src="{{ url_for('static', filename='js/echarts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/macarons.js') }}"></script>
+    <script type="text/javascript">
+        var bug_status = {{ bug_status|tojson }};
+        //var category_array = new Array();
+        var j = 0;
+        var max_number = 0;
+        var solved = 0;
+        var actived = 0;
+        var _closed = 0;
+        //j = 0;
+        for (var i in bug_status) {
+            //category_array[j] = i;
+            if (i == '已关闭'){
+                _closed = bug_status[i];
+            }
+            else if (i == '激活'){
+                actived = bug_status[i];
+            }
+            else if (i == '已解决'){
+                solved = bug_status[i];
+            }
+            if (max_number < bug_status[i]){
+                max_number = bug_status[i];
+            }
+        }
+        // 路径配置
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/pie'
+            ],
+            function (ec) {
+                // 基于准备好的dom，初始化echarts图表
+
+                 // -----pieChart start-----
+                var pieChart = ec.init(document.getElementById("piemain"), e_macarons);
+                var option={
+                    title : {
+                        text: '',
+                        subtext: '  禅道总bug数: ' + (_closed + actived + solved) + '\n',
+                        textStyle: {
+                            fontSize: 30,
+                            fontFamily: 'Arial',
+                            fontWeight: 'bolder',
+                            color: 'black'
+                        },
+                        subtextStyle: {
+                            fontSize: 20,
+                            fontFamily: 'sans-serif',
+                            //fontWeight: 'bolder',
+                            color: '#B22222'
+                        },
+                    },
+                    series : [
+                    {
+                        name:'bugs status',
+                        type:'pie',
+                        radius : [160, 200],
+                        // for funnel
+                        x: '60%',
+                        width: '35%',
+                        funnelAlign: 'left',
+                        max: max_number,
+                        itemStyle : {
+                            normal : {
+                                label : {
+                                    position : 'outer',
+                                    textStyle: {
+                                        fontSize: 20
+                                    }
+                                },
+                                labelLine : {
+                                    show : true
+                                }
+                            }
+                        },
+                        data:[
+                            {value:actived, name:'未解决:'+actived},
+                            {value:solved, name:'已解决:'+solved}
+                        ]
+                    }
+                    ]
+                };
+                pieChart.setOption(option);
+            }
+        );
+    </script>
+    <script type="text/javascript">
+      $("#menu_1 dt").addClass("selected");$("#menu_1 dd").show();;
+    </script>
+
+{% endblock %}
+

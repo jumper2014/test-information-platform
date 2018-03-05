@@ -1,0 +1,130 @@
+{% extends "main_ui_template.html" %}
+
+
+{% block title %}
+    测试信息平台
+{% endblock %}
+
+{% block body %}
+    <h2 style="text-align: center">单元测试用例统计</h2>
+
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="height:540px"></div>
+    <!-- ECharts单文件引入 -->
+    <script src="{{ url_for('static', filename='js/echarts-all.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/macarons.js') }}"></script>
+    <script type="text/javascript">
+        var client_ut_num = {{ ut_info['p2pclient_ut']}};
+        var server_ut_num = {{ ut_info['p2pserver_ut']}};
+        var pieChart = echarts.init(document.getElementById('main'));
+
+        var option = {
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b}: {c} ({d}%)"
+            },
+            title : {
+                text: '',
+                subtext: '  单元测试用例总数: ' + (client_ut_num + server_ut_num ) + '\n',
+                textStyle: {
+                    fontSize: 30,
+                    fontFamily: 'Arial',
+                    fontWeight: 'bolder',
+                    color: 'black'
+                },
+                subtextStyle: {
+                    fontSize: 20,
+                    fontFamily: 'sans-serif',
+                    //fontWeight: 'bolder',
+                    color: '#28004D'
+                },
+            },
+            series: [
+                {
+                    name:'单元测试用例分布',
+                    type:'pie',
+                    radius: ['50%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle : {
+                            normal : {
+                                label : {
+                                    position : 'outer',
+                                    textStyle: {
+                                        fontSize: 22
+                                    }
+                                },
+                                labelLine : {
+                                    show : true
+                                }
+                            }
+                        },
+                    data:[
+                        {value:server_ut_num, name:'服务器:'+server_ut_num},
+                        {value:client_ut_num, name:'客户端:'+client_ut_num},
+
+                    ]
+                }
+            ]
+        };
+
+
+
+        <!--var option = {-->
+                    <!--tooltip : {-->
+                    <!--trigger: 'item',-->
+                    <!--formatter: "{a} <br/>{b} : {c} ({d}%)"-->
+                    <!--},-->
+
+                    <!--legend: {-->
+                        <!--x : 'center',-->
+                        <!--y : 'bottom',-->
+                        <!--data:[]-->
+                    <!--},-->
+                    <!--title : {-->
+                        <!--text: '',-->
+                        <!--subtext: '  客户端单元测试数: ' + client_ut_num + '\n'  +-->
+                                 <!--'  服务器单元测试数: ' + server_ut_num + '\n',-->
+                        <!--textStyle: {-->
+                            <!--fontSize: 30,-->
+                            <!--fontFamily: 'Arial',-->
+                            <!--fontWeight: 'bolder',-->
+                            <!--color: 'black'-->
+                        <!--},-->
+                        <!--subtextStyle: {-->
+                            <!--fontSize: 20,-->
+                            <!--fontFamily: 'sans-serif',-->
+                            <!--//fontWeight: 'bolder',-->
+                            <!--color: '#ffa500'-->
+                        <!--},-->
+                    <!--},-->
+                    <!--calculable : true,-->
+                    <!--series : [-->
+
+                        <!--{-->
+                            <!--name:'面积模式',-->
+                            <!--type:'pie',-->
+                            <!--radius : [80, 160],-->
+                            <!--center : ['50%'],-->
+                            <!--roseType : 'area',-->
+                            <!--x: '50%',               // for funnel-->
+                            <!--max: 40,                // for funnel-->
+                            <!--sort : 'ascending',     // for funnel-->
+                            <!--data:[-->
+                                <!--{value:client_ut_num, name:'p2pclient_ut'},-->
+                                <!--{value:server_ut_num, name:'p2psever_ut'},-->
+
+                            <!--]-->
+                        <!--}-->
+                    <!--]-->
+                <!--};-->
+
+                // 为echarts对象加载数据
+                pieChart.setOption(option);
+
+    </script>
+    <script type="text/javascript">
+      $("#menu_1 dt").addClass("selected");$("#menu_1 dd").show();;
+    </script>
+
+{% endblock %}
+

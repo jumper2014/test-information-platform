@@ -1,0 +1,158 @@
+{% extends "main_ui_template.html" %}
+
+
+{% block title %}
+    测试信息平台
+{% endblock %}
+
+{% block body %}
+    <div id="page_title" style="height:100px">
+        <h2 style="text-align: center"> TestLink测试计划实时状态</h2>
+    </div>
+    <div id="main" style="height:540px"></div>
+    <!-- ECharts单文件引入 -->
+    <script src="{{ url_for('static', filename='js/echarts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/macarons.js') }}"></script>
+    <script type="text/javascript">
+        var data = {{ test_plan_progress|tojson }};
+        var name_array = new Array();
+        var total_array = new Array();
+        var non_exec_array = new Array();
+        var progress_array = new Array();
+        var j = 0;
+        for (var i in data) {
+            if (data[i].total != 0){
+                name_array[j] = data[i].name;
+                total_array[j] = data[i].total;
+                non_exec_array[j] = data[i].non_exec;
+                // max_number = max_number < data[i].number ? data[i].number : max_number;
+                j++;
+            }
+        }
+        for (i = 0; i < name_array.length; i++) {
+            progress_array[i] = ((total_array[i] - non_exec_array[i]) / total_array[i] * 100).toFixed(2);
+        }
+        // 路径配置
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+        // 使用
+        require(
+            [
+                'echarts',
+                'echarts/chart/bar'
+            ],
+            callBack
+        );
+        var myChart;
+        var option;
+        function callBack(ec) {
+            // 基于准备好的dom，初始化echarts图表
+            myChart = ec.init(document.getElementById('main'));
+            <!--window.onresize = myChart.resize;-->
+            <!--myChart.showLoading();-->
+            option = {
+                legend: {
+                    data:['已执行', '未执行']
+                },
+                xAxis: {
+                    type : 'value',
+                    axisLabel: {
+                        show: true,
+                        formatter: '{value}%'
+                    }
+                },
+                grid: { //
+                    x: 350,
+                    <!--y: 200,-->
+                    <!--height: '40%',-->
+                    containLabel: true
+                },
+                yAxis : [
+                    {
+                        type : 'category',
+                        data : []
+                    }
+                ],
+                series : [
+                    {
+                        name:'已执行',
+                        type:'bar',
+                        stack: '总量',
+                        itemStyle : {
+                            normal: {
+                                color : '#D9B3E6',
+                                label : {
+                                    show: true,
+                                    position: 'insideRight',
+                                    formatter:function(obj){
+                                        var c = obj['value'];
+                                        if(c != 100)
+                                        {
+                                            return ' ';
+                                        }
+                                        else
+                                        {
+                                            return c+'%'
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        data:[]
+                    },
+                    {
+                        name:'未执行',
+                        type:'bar',
+                        stack: '总量',
+                        itemStyle : {
+                            normal: {
+                                color : '#81C2D6',
+                                label : {
+                                    show: true,
+                                    position: 'insideLeft',
+                                    formatter:function(obj){
+                                        var c = 100 - obj['value'];
+                                        if(c != 0)
+                                        {
+                                            c = c.toFixed(2);
+                                        }
+                                        return c+'%'
+                                    }
+                                }
+                            }
+                        },
+                        data:[]
+                    },
+                ]
+            };
+            for (i = 0; i < name_array.length; i++) {
+                var item_done = progress_array[i];
+                option.series[0].data.push(item_done);
+                option.series[1].data.push((100 - item_done).toFixed(2));
+
+                var item = {
+                    value : name_array[i],
+                    textStyle:{
+                        color: '#8A2BE2',
+                        fontSize: 15
+                    }
+                };
+                option.yAxis[0].data.push(item);
+            };
+            // 为echarts对象加载数据
+            clearTimeout(loadingTicket);
+            var loadingTicket = setTimeout(function() {
+                myChart.hideLoading();
+                myChart.setOption(option);
+            }, 50);
+        }
+    </script>
+    <script type="text/javascript">
+      $("#menu_1 dt").addClass("selected");$("#menu_1 dd").show();;
+    </script>
+
+{% endblock %}
+

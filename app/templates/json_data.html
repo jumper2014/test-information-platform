@@ -1,0 +1,225 @@
+{% extends "main_ui_template.html" %}
+
+
+{% block title %}
+    jenkins failed builds info
+{% endblock %}
+
+
+{% block body %}
+    <style type="text/css">
+html {
+        <!--background-color: rgba(0, 0, 0, .1);-->
+    }
+
+    body {
+        margin: 0;
+    }
+
+    .timeline-box {
+        /*border: 2px solid #DFDFDF;*/
+        width: 100%;
+        margin: 0 auto;
+        padding-top: 10px;
+        border-radius: 10px;
+        margin-top: 80px;
+        /*background-color: rgba(0,0,0,.1);*/
+    }
+
+    .cd-container {
+        position: relative;
+        margin: 30px auto;
+        /*border-bottom: 2px solid #f2f2f2;*/
+    }
+
+    .cd-container::after {
+        display: block;
+        content: ".";
+        height: 0;
+        clear: both;
+        overflow: hidden;
+        visibility: hidden;
+    }
+
+    .cd-timeline-block {
+        float: left;
+        width: 100px;
+        position: relative;
+    }
+
+    .cd-timeline-content {
+        position: relative;
+        left: -30px;
+        width: 80px;
+        margin-top: 30px;
+        padding: 2px;
+        /*border:1px solid #99CCFF;*/
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .cd-timeline-block h4 {
+        font-size: 15px;
+        color: #9F9DA1;
+        margin: 0;
+        margin-bottom: 5px;
+        font-weight: 400;
+    }
+
+    .cd-timeline-block span {
+        font-size: 14px;
+        color: #9F9DA1;
+        margin: 0;
+        margin-bottom: 5px;
+    }
+
+    .cd-timeline-block::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 18px;
+        height: 4px;
+        width: 100%;
+        background: #D2D0D0;
+    }
+
+    .cd-container .cd-timeline-block:last-child:before {
+        display: none;
+    }
+
+    .cd-picture-yes,
+    .cd-picture-no {
+        width: 32px;
+        height: 32px;
+        text-align: center;
+        position: absolute;
+        top: -15px;
+        left: -5px;
+    }
+
+    .cd-date {
+        color: #989898;
+    }
+
+    .cd-picture-yes {
+        background: url("{{ url_for('static', filename='img/complete.png' )}}") center no-repeat;
+        <!--background: url('img/complete.png') center no-repeat;-->
+    }
+
+    .cd-picture-no {
+        background: url("{{ url_for('static', filename='img/failed.png' )}}") center no-repeat;
+        <!--background: url('img/failed.png') center no-repeat;-->
+    }
+
+    .cd-timeline-titlebox {
+        float: left;
+        margin-right: 50px;
+        width: 20%;
+        height: 100px;
+        text-align: right;
+        line-height: 20px;
+        color: #878787;
+        font-size: 18px;
+    }
+
+    h2 {
+        margin: 20px auto;
+        margin-top: 50px;
+        width: 50%;
+        font-family: '微软雅黑';
+        font-weight: bold;
+        text-align: center;
+        color: #444644;
+        text-shadow: 1px 2px 1px #9E9E9E;
+    }
+
+    .fa {
+        margin: 0 5px;
+        font-size: 30px;
+        color: #878787;
+    }
+
+    #timestamp {
+        margin: 0 auto;
+        width: 100%;
+        text-align: center;
+        color: #888;
+        font-size: 16px;
+    }
+}
+    </style>
+
+
+
+    <h2>Daily&nbsp;&nbsp;Test&nbsp;&nbsp;Build&nbsp;&nbsp;Failure&nbsp;&nbsp;History</h2>
+
+    <!-- timeline -->
+    <div class="timeline-box">
+    </div>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!--<script src="{{ url_for('static', filename='js/jquery.min.js' )}}"></script>-->
+
+    <script type="text/javascript">
+    // createNode
+    var create = function() {
+        $.ajax({
+            url: '/jenkins',
+            dataType: 'json',
+            success: function(data) {
+                console.log(data);
+                for (var key in data) {
+                    var sec = '<section class="cd-container"><div class="cd-timeline-titlebox">' + key + '</div></section>';
+                    $(".timeline-box").append(sec);
+                };
+                var num = -1;
+                for (var key in data) {
+
+                    num++;
+                    for (var l = 0; l < data[key].length; l++) {
+                        for (var k in data[key][l]) {
+                            appendsignal(data[key][l], k, num);
+                        };
+
+                    }
+
+                }
+            }
+        })
+    }
+    create();
+    var appendsignal = function(data, index, l) {
+        var signal;
+        signal = data[index];
+        var block_yes = '<div class="cd-timeline-block"><div class="cd-picture-yes"></div><div class="cd-timeline-content"><h4>' + index + '</h5></div></div>';
+        var block_no = '<div class="cd-timeline-block"><div class="cd-picture-no"></div><div class="cd-timeline-content"><h4>' + index + '</h5></div></div>';
+        if (signal == "1") {
+            $(".timeline-box .cd-container").eq(l).append(block_no);
+        } else {
+            $(".timeline-box .cd-container").eq(l).append(block_yes);
+        }
+    };
+    var d = new Date();
+    var h = '';
+    function leadingZeroPad(val, len) {
+        val += '';
+        while (val.length < len) {
+            val = '0' + val;
+        }
+        return val;
+    }
+    h = leadingZeroPad(d.getHours(), 2) + ':' + leadingZeroPad(d.getMinutes(), 2) + ':' + leadingZeroPad(d.getSeconds(), 2);
+    $('body').append("<h4 id='timestamp'>本页最后刷新时间" + h + "</h4>")
+    setInterval(function() {
+        location.reload(); //要执行刷新的代码
+        $('#timestamp').text("<h4>本页最后刷新时间+" + h + "+</h4>")
+    }, 60000);
+    </script>
+    <script type="text/javascript">
+      $("#menu_1 dt").addClass("selected");$("#menu_1 dd").show();;
+    </script>
+
+{% endblock %}

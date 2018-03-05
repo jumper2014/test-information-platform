@@ -1,0 +1,368 @@
+{% extends "main_ui_template.html" %}
+
+{% block title %}
+    测试信息平台
+{% endblock %}
+
+{% block body %}
+    <style type="text/css">
+        span {
+            display:inline-block;
+            width:280px;
+            text-align:right;
+            margin-right: 20px;
+        }
+
+        .adding {
+            display:inline-block;
+            width:100px;
+            text-align:left;
+            margin-left:420px;
+        }
+
+        .paging {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-pack: end;
+            -moz-box-pack: end;
+            -webkit-box-pack: end;
+            right: 0;
+            margin: 15px 0 0 350px;
+        }
+
+        .paging li,
+        .paging .page {
+            display: inline-block;
+            height: 32px;
+            font-size: 16px;
+            text-align: center;
+            color: #c9c9c9;
+            box-shadow: inset 0 0 0 1px #c9c9c9;
+            transition: box-shadow .2s, color .2s;
+            margin-right: 10px;
+        }
+
+        .paging li a,
+        .paging .page a {
+            padding: 0 10px;
+            height: 32px;
+            line-height: 32px;
+            display: block;
+            color: #999;
+        }
+
+        .paging li:hover,
+        .paging .page:hover,
+        .paging li.current,
+        .paging .page.current,
+        .paging li.active,
+        .paging .page.active {
+            color: #4eaa4c;
+            box-shadow: inset 0 0 0 1px #4eaa4c;
+        }
+
+        .paging li:hover a,
+        .paging .page:hover a,
+        .paging li.current a,
+        .paging .page.current a,
+        .paging li.active a,
+        .paging .page.active a {
+            color: #4eaa4c;
+        }
+
+        .paging ul,
+        .paging .pager {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+        }
+
+        .paging li:last-child {
+            margin-right: 0;
+        }
+
+        .ellipsis {
+            height: 32px;
+            line-height: 32px;
+            font-size: 16px;
+            text-align: center;
+            color: black;
+            margin-right: 10px;
+        }
+    </style>
+    <div>
+        <form  style="margin:40px;" method="post" action="/add-feature">
+            <span class="adding">测试任务:</span><input type="text" style="width:300px;margin-right:40px" name="featurename" id="featurename">
+            <button class="btn btn-primary radius" type="submit" id="add">添加</button>
+        </form>
+    </div>
+    <script>
+        $("#add").on('click', function() {
+            var feature_name = $("#featurename").val();
+            if (feature_name == "" || feature_name.length == 0) {
+                alert("功能测试名不能为空！");
+                return false;
+            } else {
+                var mes = confirm("您确定要添加新测试了吗?");
+                if (mes == true)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+        });
+    </script>
+    <script type="text/javascript">
+        function update_feature_status(status, value)
+        {
+            //update database
+            pos = status.indexOf('*');
+            id = status.substring(0,pos);
+            flow = status.substring(pos+1);
+            $.ajax({
+                url: '/update-feature',
+                method:'POST',
+                dataType: 'json',
+                data: {"feature_id":id, "flow":flow, "value":value},
+                success: function(res) {
+                    console.log(res);
+                    window.location.reload();
+                }
+            })
+        }
+
+        function msg(para)
+        {
+            var x=document.getElementById(para);
+            if (x.className == "btn btn-default radius")
+            {
+                var mes = confirm("您确定要开始 " + x.value + " 了吗?");
+                if (mes == true)
+                {
+                    x.className = "btn btn-warning radius";
+                    update_feature_status(x.id, 1);
+                }
+            }
+            else if(x.className == "btn btn-warning radius")
+            {
+                var mes = confirm("您确定完成 " + x.value + " 了吗?");
+                if (mes == true)
+                {
+                    x.className = "btn btn-success radius";
+                    update_feature_status(x.id, 2);
+                }
+            }
+            else
+            {
+                var mes = confirm("您确定要回退到初始状态了吗?");
+                if (mes == true)
+                {
+                    x.className = "btn btn-default radius";
+                    update_feature_status(x.id, 0);
+                }
+            }
+        }
+
+        function change_feature_name(feature_id, name){
+            //alert("Start to remove this feature!");
+            $.ajax({
+                url: '/change-feature-name',
+                method:'POST',
+                dataType: 'json',
+                data: {"feature_id":feature_id, "name":name},
+                success: function(res) {
+                    console.log(res);
+                    window.location.reload();
+                }
+            })
+        }
+
+        function modify_feature(id, feature_name)
+        {
+            new_feature_test_name = prompt("请输入新的测试计划名:", feature_name);
+            if (new_feature_test_name != null)
+            {
+                change_feature_name(id, new_feature_test_name);
+            }
+            else
+            {
+                alert("你按了'取消'按钮");
+            }
+        }
+
+        function remove_feature(id)
+        {
+            var mes = confirm("您确定移除该测试计划了吗? ");
+            if (mes == true)
+            {
+                $.ajax({
+                    url: '/remove-feature',
+                    method:'POST',
+                    dataType: 'json',
+                    data:id,
+                    success: function(res) {
+                        console.log(res);
+                        window.location.reload();
+                    }
+                })
+            }
+        }
+
+        function addSingleFeatureTest(parent_element, feature_id, feature_name, values)
+        {
+            id_list = ['demand', 'test_schema', 'review', 'achieve', 'environment', 'execute',
+                       'report', 'archive', 'storing'];
+            value_list = ['需求', '方案', '评审', '实现', '环境', '执行', '报告', '归档', '入库'];
+
+            var el_div = document.createElement('div');
+            el_div.className = "codeView docs-example text-c";
+            parent_element.appendChild(el_div);
+
+            var el_span = document.createElement('span');
+            el_span.innerHTML = feature_name;
+            el_div.appendChild(el_span);
+
+            var id_span = document.createElement('span');
+            id_span.innerHTML = feature_id;
+            id_span.style.display='none';
+            el_div.appendChild(id_span);
+
+
+            for (var i = 0; i < 9; i++)
+            {
+                var tmp_el = document.createElement('input');
+                tmp_el.type = 'button';
+                if(values[i] == '2')
+                {
+                    tmp_el.className = 'btn btn-success radius';
+                }
+                else if(values[i] == '1')
+                {
+                    tmp_el.className = 'btn btn-warning radius';
+                }
+                else if(values[i] == '0')
+                {
+                    tmp_el.className = 'btn btn-default radius';
+                }
+                tmp_el.id = feature_id + '*' + id_list[i];
+                tmp_el.value = value_list[i];
+                tmp_el.style = 'margin:0px 5px';
+                tmp_el.addEventListener('click', msg.bind(tmp_el, tmp_el.id));
+                el_div.appendChild(tmp_el);
+            }
+            //btn btn-warning-outline radius
+
+            var modify_el = document.createElement('input');
+            modify_el.type = 'button';
+            modify_el.className = 'btn btn-warning-outline radius';
+            modify_el.id = 'modify';
+            modify_el.value = '修改';
+            modify_el.style = 'margin:0px 10px 0px 0px';
+            modify_el.addEventListener('click', modify_feature.bind(modify_el, feature_id, feature_name));
+            el_div.appendChild(modify_el);
+
+            var rem_el = document.createElement('input');
+            rem_el.type = 'button';
+            rem_el.className = 'btn btn-danger-outline radius';
+            rem_el.id = 'remove';
+            rem_el.value = '移除';
+            rem_el.style = 'margin:0px 10px 0px 0px';
+            rem_el.addEventListener('click', remove_feature.bind(rem_el, feature_id));
+            el_div.appendChild(rem_el);
+
+        }
+
+
+        var feature_data = {{ sorted_feature_tests|tojson }};
+        var j = 0;
+        var cur_div = document.getElementById('main_template');
+        for (var i in feature_data) {
+            feature_id = feature_data[i].id;
+            feature_test_name = feature_data[i].name;
+            value = feature_data[i].value;
+            addSingleFeatureTest(cur_div, feature_id, feature_test_name, value);
+        }
+    </script>
+
+
+
+    <div class="paging">
+        <ul class="paging" id="ul_page">
+            <script>
+                var total_page = {{ page_info['total_page']}};
+                var current_page = {{ page_info['current_page']}};
+                var cur_div = document.getElementById('ul_page');
+                var flag = false;
+
+                function create_li(li_className, page, innerHTML="")
+                {
+                    var li_div = document.createElement('li');
+                    li_div.className = li_className;
+                    cur_div.appendChild(li_div);
+
+                    var a_div = document.createElement('a');
+                    a_div.href = "?page=" + page.toString();
+                    if (innerHTML != "") {
+                        a_div.innerHTML = innerHTML;
+                    }
+                    else {
+                        a_div.innerHTML = page.toString();
+                    }
+                    li_div.appendChild(a_div);
+                }
+
+                if (current_page > 1)
+                {
+                    create_li("page_prev", current_page - 1, "&lt;");
+                }
+
+                if (total_page >= 5)
+                {
+                    flag = true;
+                }
+                for (var i = 1; i <= total_page; i++) {
+                    if (i != current_page)
+                    {
+                        if (Math.abs(i - current_page) < 3 || Math.abs(i - total_page) < 3 || i <= 3 )
+                        {
+                            create_li("page", i);
+                        }
+                        else
+                        {
+                            if (flag)
+                            {
+                                var li_div = document.createElement('div');
+                                li_div.className = "ellipsis";
+                                li_div.innerHTML = '...';
+                                cur_div.appendChild(li_div);
+                                flag = false;
+                            }
+                        }
+                    }
+                    else if (i == current_page)
+                    {
+                        create_li("page current", i);
+                    }
+                }
+
+                if (current_page != total_page){
+                    create_li("page next", current_page + 1, "&gt;");
+                }
+            </script>
+        </ul>
+    </div>
+
+
+
+
+    <script type="text/javascript">
+          $("#menu_1 dt").addClass("selected");$("#menu_1 dd").show();;
+    </script>
+{% endblock %}
